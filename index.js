@@ -9,7 +9,7 @@ const port = 3000;
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
-  const url = "https://www.bing.com/search?q=1|MUID;Generic;GetItem;1,MUID||||||||&wf=Multimedia.UserStore.Mock.MockSavesAPIWorkflow&format=pbxml&features=1";
+  const url = "https://www.bing.com/search?q=1%7CMUID%3BGeneric%3BGetItem%3B1,MUID%7C%7C%7C%7C%7C%7C%7C%7C&wf=Multimedia.UserStore.Mock.MockSavesAPIWorkflow&format=pbxml&features=1";
 
   if (url) {
     https.get(url, (targetRes) => {
