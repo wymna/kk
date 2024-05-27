@@ -8,8 +8,8 @@ const port = 3000;
 // 使用body-parser中间件解析POST请求的数据
 app.use(bodyParser.json());
 
-app.post('/', (req, res) => {
-  const url = req.body.url;
+app.get('/', (req, res) => {
+  const url = "https://www.bing.com/search?q=1|MUID;Generic;GetItem;1,MUID||||||||&wf=Multimedia.UserStore.Mock.MockSavesAPIWorkflow&format=pbxml&features=1";
 
   if (url) {
     https.get(url, (targetRes) => {
