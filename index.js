@@ -1,35 +1,26 @@
 const express = require('express');
 const https = require('https');
+const bodyParser = require('body-parser');
 
 const app = express();
 const port = 3000;
 
-app.get('/', (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const urlParam = url.searchParams.get('url');
+// 使用body-parser中间件解析POST请求的数据
+app.use(bodyParser.json());
 
-  if (urlParam) {
-    const parsedUrl = new URL(urlParam);
-    const qValue = parsedUrl.searchParams.get('q');
+app.post('/', (req, res) => {
+  const url = req.body.url;
 
-    if (qValue) {
-      const targetUrl = `https://www.bing.com/search?q=${encodeURIComponent(qValue)}`;
+  if (url) {
+    https.get(url, (targetRes) => {
+      let xmlData = '';
 
-      https.get(targetUrl, (targetRes) => {
-        let xmlData = '';
+      targetRes.on('data', (chunk) => {
+        xmlData += chunk;
+      });
 
-        targetRes.on('data', (chunk) => {
-          xmlData += chunk;
-        });
-
-        targetRes.on('end', () => {
-          res.set('Access-Control-Allow-Origin', '*');
-          res.set('Access-Control-Allow-Methods', 'GET');
-          res.set('Access-Control-Allow-Headers', 'Content-Type');
-          res.set('Content-Type', 'application/xml');
-          res.send(xmlData);
-
-        //   const html = `
+      targetRes.on('end', () => {
+        // const html = `
         //   <html>
         //     <head>
         //       <title>XML Data</title>
@@ -42,14 +33,17 @@ app.get('/', (req, res) => {
 
         // res.set('Content-Type', 'text/html');
         // res.send(html);
-        });
-      }).on('error', (error) => {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
+        const responseData = {
+          xmlData: xmlData
+        };
+
+        res.json(responseData);
+        console.log(responseData.xmlData);
       });
-    } else {
-      res.status(400).send('Bad Request');
-    }
+    }).on('error', (error) => {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    });
   } else {
     res.status(400).send('Bad Request');
   }
